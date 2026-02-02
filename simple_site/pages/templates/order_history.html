@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>My Orders</h2>
+
+{% for order in orders %}
+<div class="order-card table-wrap">
+    <div class="order-header">
+        <strong>Order #{{ order.id }}</strong>
+        <span class="order-date">{{ order.created_at|date:"M d, Y H:i" }}</span>
+        <span class="order-total">Total: ₹ {{ order.total }}</span>
+    </div>
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+        </tr>
+        {% for item in order.orderitem_set.all %}
+        <tr>
+            <td>{{ item.product.title }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>₹ {{ item.price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% empty %}
+<p class="empty-msg">You have no orders yet. <a href="{% url 'store' %}">Shop now</a>.</p>
+{% endfor %}
+
+{% endblock %}

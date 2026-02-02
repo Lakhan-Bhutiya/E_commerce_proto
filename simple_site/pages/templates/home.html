@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}My Store – Welcome{% endblock %}
+
+{% block content %}
+<div class="landing">
+    <h1>Welcome to My Store</h1>
+    <p class="landing-lead">Discover great products and shop with ease. Browse our collection and get what you need.</p>
+    <a href="{% url 'store' %}" class="btn btn-primary btn-lg">Shop Now</a>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Your Cart</h2>
+
+{% if msg %}
+<p class="alert-error">{{ msg }}</p>
+{% endif %}
+
+<div class="table-wrap">
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+        </tr>
+
+        {% for i in items %}
+        <tr>
+            <td>{{ i.product.title }}</td>
+            <td>
+                <div class="cart-actions">
+                    <a href="{% url 'cart_update' i.id 'dec' %}">−</a>
+                    <span>{{ i.quantity }}</span>
+                    <a href="{% url 'cart_update' i.id 'inc' %}">+</a>
+                </div>
+            </td>
+            <td>₹ {{ i.product.price }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="empty-msg">Cart is empty</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="cart-footer">
+    <div class="cart-total">Total: ₹ {{ total }}</div>
+    <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
+</div>
+{% endblock %}

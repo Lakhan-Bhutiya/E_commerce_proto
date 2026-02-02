@@ -1,0 +1,23 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="admin-dashboard-counts" class="mb-4">
+    <h2 class="mb-3">{% trans "Overview" %}</h2>
+    <div class="row">
+        {% for item in dashboard_counts %}
+        <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+            <a href="{% url 'admin:app_list' item.app_label %}" class="text-decoration-none text-reset">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="display-6 fw-bold text-primary">{{ item.count }}</div>
+                        <div class="small text-muted">{{ item.label }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{{ block.super }}
+{% endblock %}

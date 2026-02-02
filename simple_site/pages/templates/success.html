@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="success-box">
+    <h2>Order Successful</h2>
+    <p>Your order id is {{ order.id }}</p>
+    <a href="{% url 'store' %}" class="btn btn-primary">Back to Store</a>
+</div>
+
+{% endblock %}

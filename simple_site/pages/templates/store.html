@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Store{% endblock %}
+
+{% block content %}
+
+<h2>Store</h2>
+
+<div class="store-filters">
+    <form class="store-filter-form" method="get" action="{% url 'store' %}">
+        {% if current_cat %}<input type="hidden" name="cat" value="{{ current_cat }}">{% endif %}
+        <input type="hidden" name="sort" value="{{ current_sort }}">
+        <input type="hidden" name="date" value="{{ current_date }}">
+        <div class="filter-row">
+            <label class="filter-search-wrap">
+                <span class="filter-label">Search</span>
+                <input type="search" name="q" value="{{ search_query }}" placeholder="Search products..." class="filter-search">
+            </label>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    <div class="filter-controls">
+        <div class="filter-group">
+            <span class="filter-label">Sort by</span>
+            <div class="filter-options">
+                <a href="{{ filter_urls.sort_newest }}" class="filter-pill {% if current_sort == 'newest' %}active{% endif %}">Newest</a>
+                <a href="{{ filter_urls.sort_oldest }}" class="filter-pill {% if current_sort == 'oldest' %}active{% endif %}">Oldest</a>
+                <a href="{{ filter_urls.sort_price_asc }}" class="filter-pill {% if current_sort == 'price_asc' %}active{% endif %}">Price ↑</a>
+                <a href="{{ filter_urls.sort_price_desc }}" class="filter-pill {% if current_sort == 'price_desc' %}active{% endif %}">Price ↓</a>
+                <a href="{{ filter_urls.sort_name_asc }}" class="filter-pill {% if current_sort == 'name_asc' %}active{% endif %}">Name A–Z</a>
+                <a href="{{ filter_urls.sort_name_desc }}" class="filter-pill {% if current_sort == 'name_desc' %}active{% endif %}">Name Z–A</a>
+            </div>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Added</span>
+            <div class="filter-options">
+                <a href="{{ filter_urls.date_all }}" class="filter-pill {% if current_date == 'all' %}active{% endif %}">Any time</a>
+                <a href="{{ filter_urls.date_week }}" class="filter-pill {% if current_date == 'week' %}active{% endif %}">Last 7 days</a>
+                <a href="{{ filter_urls.date_month }}" class="filter-pill {% if current_date == 'month' %}active{% endif %}">Last 30 days</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="store-layout">
+
+    <aside class="sidebar">
+        <h3>Categories</h3>
+        <a href="{{ filter_urls.all_cats }}">All</a>
+        {% for c, cat_url in categories_with_urls %}
+            <a href="{{ cat_url }}">{{ c.name }}</a>
+        {% endfor %}
+    </aside>
+
+    <div class="product-grid">
+        {% for p in products %}
+        <article class="product-card">
+            <a href="{% url 'product_detail' p.id %}">
+                <img src="{{ p.image.url }}" alt="{{ p.title }}">
+            </a>
+            <div class="card-body">
+                <h4><a href="{% url 'product_detail' p.id %}">{{ p.title }}</a></h4>
+                <p>{{ p.description|truncatewords:10 }}</p>
+                <div class="price">₹ {{ p.price }}</div>
+                <div class="meta">Stock: {{ p.stock }}</div>
+                {% if p.stock > 0 %}
+                <a href="{% url 'add_to_cart' p.id %}" class="btn btn-primary">Add to Cart</a>
+                {% else %}
+                <span class="out-of-stock-label">Out of stock</span>
+                {% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <p class="empty-msg">No products found. Try changing search or filters.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

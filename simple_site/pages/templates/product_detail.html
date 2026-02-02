@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="product-detail">
+    <div class="product-image-wrap">
+        <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-image">
+    </div>
+    <div>
+        <h2>{{ product.title }}</h2>
+        <p class="description">{{ product.description }}</p>
+        <div class="price">₹ {{ product.price }}</div>
+        <p class="stock">Stock: {{ product.stock }}</p>
+        {% if product.stock > 0 %}
+        <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary">Add to Cart</a>
+        {% else %}
+        <p class="out-of-stock">Out of stock</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
