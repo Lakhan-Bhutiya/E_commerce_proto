@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .models import SiteUser, Product, Category
+from django.db.models import Avg
+from .models import SiteUser, Product, Category, Review, Order, OrderItem
 
 
 # =========================
@@ -71,7 +72,10 @@ def logout_view(request):
 # =========================
 
 def home(request):
-    return render(request, 'home.html')
+    featured_products = Product.objects.annotate(
+        avg_rating=Avg('reviews__rating')
+    ).order_by('-avg_rating')[:4]
+    return render(request, 'home.html', {'featured_products': featured_products})
 
 
 # =========================
@@ -101,7 +105,7 @@ def store(request):
         params['date'] = overrides.get('date', date_filter)
         return '?' + urlencode(params)
 
-    products = Product.objects.all()
+    products = Product.objects.annotate(avg_rating=Avg('reviews__rating'))
 
     # Category filter
     if cat_id:
@@ -286,8 +290,40 @@ def order_history(request):
 
 def product_detail(request, pid):
     product = get_object_or_404(Product, id=pid)
+    reviews = Review.objects.filter(product=product).order_by('-created_at')
+    avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
+    can_review = False
+    if 'user_email' in request.session:
+        user = SiteUser.objects.get(email=request.session['user_email'])
+        purchased_items = OrderItem.objects.filter(order__user=user, product=product)
+        reviewed_ids = Review.objects.filter(
+            user=user,
+            product=product,
+            order_item__isnull=False
+        ).values_list('order_item_id', flat=True)
+        unreviewed_items = purchased_items.exclude(id__in=reviewed_ids)
+        can_review = unreviewed_items.exists()
+
+        if request.method == 'POST' and can_review:
+            rating = request.POST.get('rating')
+            comment = request.POST.get('comment')
+            if rating and comment:
+                target_item = unreviewed_items.order_by('-id').first()
+                Review.objects.create(
+                    user=user,
+                    product=product,
+                    order_item=target_item,
+                    rating=int(rating),
+                    comment=comment
+                )
+                return redirect('product_detail', pid=pid)
+
     return render(request, 'product_detail.html', {
-        'product': product
+        'product': product,
+        'reviews': reviews,
+        'avg_rating': avg_rating,
+        'can_review': can_review
     })
 
 

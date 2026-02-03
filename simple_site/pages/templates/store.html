@@ -62,6 +62,9 @@
             </a>
             <div class="card-body">
                 <h4><a href="{% url 'product_detail' p.id %}">{{ p.title }}</a></h4>
+                <div class="rating">
+                    <span style="color: #ffc107;">★</span> {{ p.avg_rating|default:"0"|floatformat:1 }} / 5
+                </div>
                 <p>{{ p.description|truncatewords:10 }}</p>
                 <div class="price">₹ {{ p.price }}</div>
                 <div class="meta">Stock: {{ p.stock }}</div>

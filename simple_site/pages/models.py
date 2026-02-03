@@ -68,3 +68,15 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return self.product.title
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(SiteUser, on_delete=models.CASCADE)
+    order_item = models.ForeignKey(OrderItem, on_delete=models.SET_NULL, null=True, blank=True)
+    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.name} - {self.product.title} ({self.rating})"

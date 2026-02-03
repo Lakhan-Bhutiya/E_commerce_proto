@@ -8,4 +8,33 @@
     <p class="landing-lead">Discover great products and shop with ease. Browse our collection and get what you need.</p>
     <a href="{% url 'store' %}" class="btn btn-primary btn-lg">Shop Now</a>
 </div>
+
+{% if featured_products %}
+<div class="featured-section" style="margin-top: 60px;">
+    <h2 style="text-align: center; margin-bottom: 30px;">Top Rated Products</h2>
+    <div class="product-grid">
+        {% for p in featured_products %}
+        <article class="product-card">
+            <a href="{% url 'product_detail' p.id %}">
+                <img src="{{ p.image.url }}" alt="{{ p.title }}">
+            </a>
+            <div class="card-body">
+                <h4><a href="{% url 'product_detail' p.id %}">{{ p.title }}</a></h4>
+                <div class="rating">
+                    <span style="color: #ffc107;">★</span> {{ p.avg_rating|default:"0"|floatformat:1 }} / 5
+                </div>
+                <p>{{ p.description|truncatewords:10 }}</p>
+                <div class="price">₹ {{ p.price }}</div>
+                <div class="meta">Stock: {{ p.stock }}</div>
+                {% if p.stock > 0 %}
+                <a href="{% url 'add_to_cart' p.id %}" class="btn btn-primary">Add to Cart</a>
+                {% else %}
+                <span class="out-of-stock-label">Out of stock</span>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}
