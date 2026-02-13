@@ -2,6 +2,8 @@
 
 This is a Django-based e-commerce web application developed as a learning project. It demonstrates the implementation of core e-commerce functionalities such as custom authentication, product browsing, shopping cart management, and order processing.
 
+![Website Screenshot](screenshots/website_ss.png)
+
 ## Features
 
 *   **Custom Authentication System**:
