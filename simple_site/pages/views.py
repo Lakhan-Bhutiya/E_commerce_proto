@@ -269,8 +269,39 @@ def checkout(request):
 
 
 # =========================
-# ORDER HISTORY
+# ORDER HISTORY & PDF
 # =========================
+
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+def generate_invoice_pdf(request, order_id):
+    if 'user_email' not in request.session:
+        return redirect(reverse('login') + '?next=' + reverse('order_pdf', kwargs={'order_id': order_id}))
+
+    user = SiteUser.objects.get(email=request.session['user_email'])
+    order = get_object_or_404(Order, id=order_id, user=user)
+
+    template_path = 'invoice_pdf.html'
+    context = {'order': order, 'user': user}
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order.invoice_number}.pdf"'
+    
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+       html, dest=response)
+
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
 
 def order_history(request):
     if 'user_email' not in request.session:

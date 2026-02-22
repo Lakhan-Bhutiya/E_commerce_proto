@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - {{ order.invoice_number }}</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            @frame header_frame {           /* Static Frame */
+                -pdf-frame-content: header_content;
+                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+            }
+            @frame content_frame {          /* Content Frame */
+                left: 50pt; width: 512pt; top: 90pt; height: 632pt;
+            }
+            @frame footer_frame {           /* Another static Frame */
+                -pdf-frame-content: footer_content;
+                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+            }
+        }
+        
+        body {
+            font-family: Helvetica, sans-serif;
+            font-size: 14px;
+            color: #333333;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 5px;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header table {
+            width: 100%;
+        }
+
+        .header td {
+            vertical-align: top;
+        }
+
+        .company-info {
+            font-size: 14px;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .invoice-details {
+            text-align: right;
+        }
+
+        .invoice-details p {
+            margin: 2px 0;
+        }
+
+        .billing-info {
+            margin-bottom: 30px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .billing-info h3 {
+            margin-top: 0;
+            color: #34495e;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table th {
+            background-color: #34495e;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .items-table th.right, .items-table td.right {
+            text-align: right;
+        }
+
+        .items-table th.center, .items-table td.center {
+            text-align: center;
+        }
+
+        .total-section {
+            width: 100%;
+        }
+
+        .total-section td {
+            padding: 5px 10px;
+        }
+
+        .total-row {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header_content">
+        <h1>INVOICE</h1>
+    </div>
+
+    <div class="header">
+        <table>
+            <tr>
+                <td class="company-info" style="width: 50%;">
+                    <div class="company-name">Simple E-Commerce Site</div>
+                    123 Commerce St.<br>
+                    Tech City, TC 12345<br>
+                    support@simplesite.com
+                </td>
+                <td class="invoice-details" style="width: 50%;">
+                    <p><strong>Invoice No:</strong> {{ order.invoice_number }}</p>
+                    <p><strong>Order ID:</strong> #{{ order.id }}</p>
+                    <p><strong>Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="billing-info">
+        <h3>Billed To:</h3>
+        <p>
+            <strong>{{ user.name }}</strong><br>
+            {{ user.email }}<br>
+            {% if user.mobile %}{{ user.mobile }}<br>{% endif %}
+        </p>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th class="center">Qty</th>
+                <th class="right">Unit Price</th>
+                <th class="right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.orderitem_set.all %}
+            <tr>
+                <td>{{ item.product.title }}</td>
+                <td class="center">{{ item.quantity }}</td>
+                <td class="right">₹{{ item.price }}</td>
+                <td class="right">₹{{ item.price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="total-section">
+        <tr>
+            <td style="width: 60%;"></td>
+            <td style="width: 40%;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="right">Subtotal:</td>
+                        <td class="right">₹{{ order.total }}</td>
+                    </tr>
+                    <tr>
+                        <td class="right">Tax (0%):</td>
+                        <td class="right">₹0.00</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td class="right">Total Due:</td>
+                        <td class="right">₹{{ order.total }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <div id="footer_content" class="footer">
+        Thank you for your business! | Simple E-Commerce Site | Page <pdf:pagenumber> of <pdf:pagecount>
+    </div>
+
+</body>
+</html>
